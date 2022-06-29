@@ -2,7 +2,7 @@
 
 const std = @import("std");
 
-const Color = @import("vec3.zig").Color;
+pub const Color = @import("vec3.zig");
 
 /// Writes a color out to the given stream
 pub fn writeColor(stream: *const std.fs.File, color: *Color) !void {

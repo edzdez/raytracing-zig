@@ -1,5 +1,4 @@
 //! This module provides a struct representing a three dimentional vector.
-//! It provides `Point3` and `Color` as aliases to better convey intent.
 
 const Self = @This();
 
@@ -7,7 +6,7 @@ const std = @import("std");
 
 vals: @Vector(3, f64),
 
-/// Returns a `vec3` struct from 3 arguments representing
+/// Returns a `Vec3` struct from 3 arguments representing
 /// (x, y, z)
 pub fn init(x: f64, y: f64, z: f64) Self {
     return Self{
@@ -15,52 +14,52 @@ pub fn init(x: f64, y: f64, z: f64) Self {
     };
 }
 
-/// Returns the `x` value of a `vec3`
+/// Returns the `x` value of a `Vec3`
 pub fn getX(self: *const Self) f64 {
     return self.vals[0];
 }
 
-/// Returns the `y` value of a `vec3`
+/// Returns the `y` value of a `Vec3`
 pub fn getY(self: *const Self) f64 {
     return self.vals[1];
 }
 
-/// Returns the `z` value of a `vec3`
+/// Returns the `z` value of a `Vec3`
 pub fn getZ(self: *const Self) f64 {
     return self.vals[2];
 }
 
-/// Returns the result of multiplying a `vec3` by a scalar
+/// Returns the result of multiplying a `Vec3` by a scalar
 pub fn scalarMultiply(self: *const Self, scalar: f64) Self {
     return Self{ .vals = self.vals * @splat(3, scalar) };
 }
 
-/// Returns the result of dividing a `vec3` by a scalar
+/// Returns the result of dividing a `Vec3` by a scalar
 pub fn scalarDivide(self: *const Self, scalar: f64) Self {
     return Self{ .vals = self.vals / @splat(3, scalar) };
 }
 
-/// Returns the result of adding two `vec3`s
+/// Returns the result of adding two `Vec3`s
 pub fn add(self: *const Self, other: *const Self) Self {
     return Self{ .vals = self.vals + other.vals };
 }
 
-/// Returns the result of subtracting two `vec3`s
+/// Returns the result of subtracting two `Vec3`s
 pub fn subtract(self: *const Self, other: *const Self) Self {
     return Self{ .vals = self.vals - other.vals };
 }
 
-/// Returns the result of multiplying two `vec3`s
+/// Returns the result of multiplying two `Vec3`s
 pub fn multiply(self: *const Self, other: *const Self) Self {
     return Self{ .vals = self.vals * other.vals };
 }
 
-/// Returns the dot product of two `vec3`s
+/// Returns the dot product of two `Vec3`s
 pub fn dot(self: *const Self, other: *const Self) f64 {
     return self.getX() * other.getX() + self.getY() * other.getY() + self.getZ() * other.getZ();
 }
 
-/// Returns the cross product of two `vec3`s
+/// Returns the cross product of two `Vec3`s
 pub fn cross(self: *const Self, other: *const Self) Self {
     return Self.init(
         self.getY() * other.getZ() - self.getZ() * other.getY(),
@@ -69,29 +68,21 @@ pub fn cross(self: *const Self, other: *const Self) Self {
     );
 }
 
-/// Returns the unit vector of a `vec3`
+/// Returns the unit vector of a `Vec3`
 pub fn normalize(self: *const Self) Self {
     return self.scalarDivide(self.norm());
 }
 
-/// Returns the norm of a `vec3`
+/// Returns the norm of a `Vec3`
 pub fn norm(self: *const Self) f64 {
     return @sqrt(self.normSquared());
 }
 
-/// Returns the square of the norm of a `vec3`
+/// Returns the square of the norm of a `Vec3`
 pub fn normSquared(self: *const Self) f64 {
     const new_vec = self.vals * self.vals;
     return @reduce(.Add, new_vec);
 }
-
-/// A struct representing a point in three dimentional space.
-/// Alias for `vec3`
-pub const Point3 = Self;
-
-/// A struct representing an rgb color.
-/// Alias for `vec3`
-pub const Color = Self;
 
 test "vec3/vec3.accessors" {
     const vec3 = Self.init(1.0, 2.0, 3.0);

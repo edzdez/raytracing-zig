@@ -1,7 +1,6 @@
 const std = @import("std");
 
-const Vec3 = @import("vec3.zig");
-const Color = Vec3.Color;
+const Color = @import("vec3.zig");
 const color = @import("color.zig");
 
 pub fn main() !void {
