@@ -6,7 +6,7 @@ const Color = color.Color;
 const Ray = @import("ray.zig");
 const Point3 = Ray.Point3;
 
-fn hitSphere(center: *const Point3, radius: f64, ray: *const Ray) bool {
+fn hitSphere(center: *const Point3, radius: f64, ray: *const Ray) f64 {
     // A sphere is given by the equation: $\left( x - C_x \right)^2 + \left( y - C_y \right)^2 + \left( z - C_z \right)^2 = r^2$.
     // Written in vector form, we get: $\left(\textbf{P} - \textbf{C}\right) \cdot \left(\textbf{P} - \textbf{C}\right) = r^2$.
     // Thus, any point P that satisfies this equation is on the sphere. We want to know if our Ray $\textbf{P}(t) = \textbf{A} + t\textbf{b}$
@@ -27,20 +27,33 @@ fn hitSphere(center: *const Point3, radius: f64, ray: *const Ray) bool {
     const c = Vec3.dot(&origin_to_center, &origin_to_center) - radius * radius;
 
     const discriminant = b * b - 4 * a * c;
-    return discriminant > 0;
+
+    if (discriminant < 0) {
+        // if the discriminant is negative, then the ray does not hit the sphere
+        return -1.0;
+    } else {
+        // if the ray hits the sphere, return the $t$ corresponding to the closest hit point using the quadratic formula.
+        return (-b - @sqrt(discriminant)) / (2.0 * a);
+    }
 }
 
 fn rayColor(r: *const Ray) Color {
-    // if this ray hits the sphere, color it red
-    if (hitSphere(&Point3.init(0.0, 0.0, -1.0), 0.5, r))
-        return Color.init(1.0, 0.0, 0.0);
+    var t: f64 = hitSphere(&Point3.init(0.0, 0.0, -1.0), 0.5, r);
+    if (t > 0.0) {
+        // if the ray hits the sphere, get the surface normal (vector perpendicular to the surface at the point of interesection).
+        // for a sphere, this is given by the equation $\left(\textbf{P} - \textbf{C}\right)$
+        const n = r.at(t).subtract(&Vec3.init(0.0, 0.0, -1.0)).normalize();
+
+        // map (x, y, z) to (r, g, b) to create a color map.
+        return Color.init(n.getX() + 1.0, n.getY() + 1.0, n.getZ() + 1.0).scalarDivide(2);
+    }
 
     // scale the ray direction to unit length (-1.0 < y < 1.0)
-    const unit_direction = Vec3.normalize(&r.getDirection());
+    const unit_direction = r.getDirection().normalize();
 
     // scale t to 0.0 <= t <= 1.0. When t = 0, we get blue. When it's 1, we get white. Everything in between is a blend.
     // This performs a linear interpolation (or lerp for short)
-    const t = 0.5 * (unit_direction.getY() + 1.0);
+    t = 0.5 * (unit_direction.getY() + 1.0);
 
     // a lerp is always in the form $\text{blendedValue} = \left( 1 - t \right) \cdot \text{startValue} + t \cdot \text{endValue}$,
     // where t ranges from 0 to 1
