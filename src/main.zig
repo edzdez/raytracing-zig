@@ -20,20 +20,28 @@ fn hitSphere(center: *const Point3, radius: f64, ray: *const Ray) f64 {
     const origin_to_center = ray.getOrigin().subtract(center);
 
     // $a = t^{2}\textbf{b} \cdot \textbf{b}$
-    const a = Vec3.dot(&ray.getDirection(), &ray.getDirection());
+    // const a = Vec3.dot(&ray.getDirection(), &ray.getDirection());
     // $b = 2t\textbf{b} \cdot \left(\textbf{A} - \textbf{C}\right)$
-    const b = 2.0 * Vec3.dot(&ray.getDirection(), &origin_to_center);
+    // const b = 2.0 * Vec3.dot(&ray.getDirection(), &origin_to_center);
     // $c = \left(\textbf{A} - \textbf{C}\right) \cdot \left(\textbf{A} - \textbf{C}\right) - r^{2}$
-    const c = Vec3.dot(&origin_to_center, &origin_to_center) - radius * radius;
+    // const c = Vec3.dot(&origin_to_center, &origin_to_center) - radius * radius;
+    // const discriminant = b * b - 4 * a * c;
 
-    const discriminant = b * b - 4 * a * c;
+    // Notice how a vector dotted with itself is equal to the norm^2 of that vector and that b = 2 * something.
+    // If we let $b = 2h$, the quadratic formula becomes: $t = \frac{-2h \pm \sqrt{\left(2h\right)^2 - 4ac}}{2a}$
+    // Simplifying, we end up with the equation $t = \frac{-h \pm \sqrt{h^2 - ac}}{a}$
+    const a = ray.getDirection().normSquared();
+    const h = Vec3.dot(&ray.getDirection(), &origin_to_center);
+    const c = origin_to_center.normSquared() - radius * radius;
+    const discriminant = h * h - a * c;
 
     if (discriminant < 0) {
         // if the discriminant is negative, then the ray does not hit the sphere
         return -1.0;
     } else {
         // if the ray hits the sphere, return the $t$ corresponding to the closest hit point using the quadratic formula.
-        return (-b - @sqrt(discriminant)) / (2.0 * a);
+        // return (-b - @sqrt(discriminant)) / (2.0 * a);
+        return (-h - @sqrt(discriminant)) / a;
     }
 }
 
